@@ -3,4 +3,14 @@ name = "iron-throne"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+[[bin]]
+name = "tests"
+path = "test/test.rs"
+
 [dependencies]
+diesel = { version = "2.2.0", features = ["postgres"] }
+dotenvy = "0.15"
