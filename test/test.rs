@@ -1,11 +1,9 @@
 mod modules {
-    pub mod database;  // Agora o Rust sabe onde procurar o módulo `database`
+    pub mod database; // Agora o Rust sabe onde procurar o módulo `database`
 }
 mod subpart {
-    pub mod reflection;  // Agora o Rust sabe onde procurar o módulo `database`
+    pub mod reflection; // Agora o Rust sabe onde procurar o módulo `database`
 }
-
-
 
 pub fn divide_non_zero_result(a: u32, b: u32) -> u32 {
     if b == 0 {
@@ -16,15 +14,11 @@ pub fn divide_non_zero_result(a: u32, b: u32) -> u32 {
     a / b
 }
 
-
-
-
 #[cfg(test)]
 mod tests {
     use modules::database;
 
     use super::*;
-  
 
     #[test]
     fn test_divide() {
@@ -44,11 +38,11 @@ mod tests {
     }
 
     #[test]
-    fn database_tests(){
+    fn database_tests() {
         database::database_tests::test_establish_connection();
     }
 }
 
-fn main(){
+fn main() {
     println!("testing...");
 }

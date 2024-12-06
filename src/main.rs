@@ -4,18 +4,21 @@ use validation_macro::Validate;
 struct Product {
     #[not_null]
     id: Option<i32>,
-    #[max_size = 120]
+
+    #[min_size = 5]
+    #[max_size = 11]
     name: String,
 }
 
-fn main() {
-    let product = Product {
-        id: Some(11),
-        name: "A product name that is way too long and exceeds the limit".to_string(),
-    };
-
-    match product.validate() {
-        Ok(_) => println!("Product is valid"),
-        Err(err) => println!("Validation error: {}", err),
+impl Product {
+    pub fn new(id: Option<i32>, name: String) -> Result<Self, String> {
+        let product = Product { id, name };
+        product.validate().map_err(|e| e.to_string())?;
+        Ok(product)
     }
+}
+
+fn main() {
+    let biscoit = Product::new(Some(11), "12345674289fjhgfdfgdfdf0".to_string());
+    println!("{:?}", biscoit);
 }
