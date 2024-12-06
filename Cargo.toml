@@ -1,6 +1,6 @@
 [package]
 name = "iron-throne"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 
 [[bin]]
@@ -12,5 +12,11 @@ name = "tests"
 path = "test/test.rs"
 
 [dependencies]
+validation_macro = { path = "./modules/validation" }
 diesel = { version = "2.2.0", features = ["postgres"] }
 dotenvy = "0.15"
+syn = "2.0"  
+quote = "1.0"  
+proc-macro2 = "1.0" 
+
+

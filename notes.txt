@@ -1,1 +1,2 @@
 psql -h localhost -U admin -d teste  
+cargo test -- --nocapture
