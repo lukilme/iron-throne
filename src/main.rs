@@ -1,24 +1,19 @@
-use validation_macro::Validate;
+use validator_derive::Validate; 
+use validator::Validate;
 
 #[derive(Debug, Validate)]
-struct Product {
-    #[not_null]
-    id: Option<i32>,
-
-    #[min_size = 5]
-    #[max_size = 11]
-    name: String,
-}
-
-impl Product {
-    pub fn new(id: Option<i32>, name: String) -> Result<Self, String> {
-        let product = Product { id, name };
-        product.validate().map_err(|e| e.to_string())?;
-        Ok(product)
-    }
+struct User {
+    #[validate(length(min = 3, max = 50))]
+    username: String,
 }
 
 fn main() {
-    let biscoit = Product::new(Some(11), "12345674289fjhgfdfgdfdf0".to_string());
-    println!("{:?}", biscoit);
+    let user = User {
+        username: "abkkk".to_string(), 
+    };
+
+    match user.validate() {
+        Ok(_) => println!("Usuário válido!"),
+        Err(e) => println!("Erro de validação: {:?}", e),
+    }
 }
