@@ -2,6 +2,8 @@ mod modules {
     pub mod db {
         pub mod connection;
         pub mod dao;
+
+        pub mod test_db;
     }
 }
 
