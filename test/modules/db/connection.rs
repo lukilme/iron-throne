@@ -5,7 +5,6 @@ pub mod lib_module {
 use lib_module::Database;
 #[allow(dead_code)]
 use lib_module::DatabaseError;
-#[allow(dead_code)]
 use dotenvy::dotenv_override;
 use std::env;
 
@@ -43,7 +42,7 @@ fn test_execute_query() {
 
     let select_query = "SELECT * FROM \"Users\";";
     let result = db.execute_query(select_query);
-    //println!("{:?}", result);
+    println!("{:?}", result);
     assert!(result.is_ok());
 
     let rows_returned = result.unwrap();
@@ -107,3 +106,7 @@ fn test_invalid_database_url() {
     println!("Valor restaurado de DATABASE_URL: {:?} and result {:?}", restored_value, result);
 }
 
+#[allow(dead_code)]
+fn main(){
+    dotenv_override().ok();
+}

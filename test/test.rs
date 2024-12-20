@@ -6,9 +6,7 @@ mod modules {
     }
 }
 
-mod subpart {
-    pub mod reflection; 
-}
+
 
 fn main() {
     println!("test");
