@@ -4,7 +4,7 @@ services:
     container_name: postgres-db
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD:
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: teste
     ports:
       - "5432:5432"

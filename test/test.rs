@@ -3,7 +3,6 @@ mod modules {
         pub mod connection;
         pub mod dao;
 
-        pub mod test_db;
     }
 }
 
