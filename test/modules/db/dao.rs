@@ -32,7 +32,12 @@ fn create_table(){
         coisa: u32,
         septo: String
     }
-    impl DAO for Treco {}
+
+    impl DAO for Treco {
+        fn primary_key_field() -> String {
+            "coisa".to_string()
+        }
+    }
 
     Treco::create();
 }
@@ -51,14 +56,18 @@ fn create_a_simple_object(){
         ativo: bool,
     }
 
-
     let usuario = Usuario {
         id:1,
         nome: "Joao".to_string(),
         idade: 666,
         ativo: true,
     };
-    impl DAO for Usuario {}
+    
+    impl DAO for Usuario {
+        fn primary_key_field() -> String {
+            "id".to_string()
+        }
+    }
 
     let query = Usuario::create_sql_query();
     println!("{}", query);
@@ -68,9 +77,6 @@ fn create_a_simple_object(){
 
     println!("{:?}",result);
     assert!(result.is_ok());
-
-
-
 }
 
 #[allow(dead_code)]

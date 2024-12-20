@@ -38,6 +38,7 @@ impl Database {
         Ok(())
     }
 
+   
 
     #[allow(dead_code)]
     pub fn get_connection(&mut self) -> Result<&mut PgConnection, DatabaseError> {
