@@ -1,29 +1,55 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-pub trait DAO: Serialize + for<'de> Deserialize<'de> + Default {
+pub trait DAOInterface: Serialize + for<'de> Deserialize<'de> + Default {
+    fn create(&self);
+    fn delete(&self);
+    fn persist(&self);
+    fn unpersist(&self);
+    fn read(&self);
+    fn update(&self);
+}
+
+pub trait DAO: DAOInterface {
     fn create(&self) {
         let mut db = SINGLETON_INSTANCE.lock().unwrap();
-        let retorno = db.execute_query(&Self::create_sql_query());
-        println!("{}", retorno);
+        let _ = db.execute_query(&Self::create_sql_query());
     }
 
-    fn delete(&self) {
-        println!("Deletando registro: Primary Key {}", self.get_primary_key());
+    fn persist(&self){
+
     }
 
-    fn persist(&self) {
-        println!(
-            "Persistindo registro: Primary Key {}",
-            self.get_primary_key()
-        );
+    fn unpersist(&self){
+
+    }
+
+    fn read(&self){
+
+    }
+    
+    fn update(&self){
+
+    }
+
+    fn shine(&self) {
+        let json = serde_json::to_value(self).unwrap();
+        if let Value::Object(mapa) = json {
+            for (campo, valor) in mapa {
+                println!("Campo: {}, Valor: {}", campo, valor);
+            }
+        }
+    }
+
+    fn save(&self) {
         let json = serde_json::to_value(self).unwrap();
         if let Value::Object(fields) = json {
+            //get actual name of object self
             let table_name = std::any::type_name::<Self>().rsplit("::").next().unwrap();
 
             let columns: Vec<String> = fields.keys().cloned().collect();
             let placeholders: Vec<String> = columns.iter().map(|_| "?".to_string()).collect();
-            let _values: Vec<String> = fields
+            let values: Vec<String> = fields
                 .values()
                 .map(|v| match v {
                     Value::String(s) => s.clone(),
@@ -33,32 +59,50 @@ pub trait DAO: Serialize + for<'de> Deserialize<'de> + Default {
                 })
                 .collect();
 
-            let _query = format!(
+            let query = format!(
                 "INSERT OR REPLACE INTO {} ({}) VALUES ({});",
                 table_name,
                 columns.join(", "),
                 placeholders.join(", ")
             );
 
-            let mut _db = SINGLETON_INSTANCE.lock().unwrap();
+            let mut db = SINGLETON_INSTANCE.lock().unwrap();
             //db.execute_query_with_params(&query, values);
         }
     }
 
-    fn unpersist(&self) {
-        println!(
-            "Removendo persistência do registro: Primary Key {}",
-            self.get_primary_key()
-        );
+    fn delete(&self) {
+        let primary_key_field = Self::primary_key_field();
+        let json = serde_json::to_value(self).unwrap();
+
+        if let Value::Object(fields) = json {
+            if let Some(primary_key_value) = fields.get(&primary_key_field) {
+                let table_name = std::any::type_name::<Self>().rsplit("::").next().unwrap();
+
+                let query = format!(
+                    "DELETE FROM {} WHERE {} = ?;",
+                    table_name, primary_key_field
+                );
+
+                let mut db = SINGLETON_INSTANCE.lock().unwrap();
+                //db.execute_query_with_params(&query, vec![primary_key_value.to_string()]);
+            } else {
+                eprintln!(
+                    "Primary key field '{}' not found in the struct.",
+                    primary_key_field
+                );
+            }
+        }
     }
+
     fn create_sql_query() -> String {
         let example = Self::default();
         let json_example = serde_json::to_value(example).unwrap();
 
         if let Value::Object(mapa) = json_example {
             let mut colunas: Vec<String> = Vec::new();
-            let primary_field = "Empty".to_string();
-            let mut _has_primary_key = false;
+            let primary_field = Self::primary_key_field();
+            let mut has_primary_key = false;
 
             for (campo, valor) in mapa {
                 let tipo_sql = match valor {
@@ -70,7 +114,7 @@ pub trait DAO: Serialize + for<'de> Deserialize<'de> + Default {
 
                 if campo == primary_field {
                     colunas.push(format!("{} {} PRIMARY KEY", campo, tipo_sql));
-                    _has_primary_key = true;
+                    has_primary_key = true;
                 } else {
                     colunas.push(format!("{} {}", campo, tipo_sql));
                 }
@@ -82,28 +126,10 @@ pub trait DAO: Serialize + for<'de> Deserialize<'de> + Default {
                 nome_tabela,
                 colunas.join(",\n    ")
             );
-            println!("{}", query);
             return query;
         }
         String::new()
     }
 
-    fn read(&self) {
-        println!("Lendo registro: Primary Key {}", self.get_primary_key());
-    }
-
-    fn update(&self) {
-        println!(
-            "Atualizando registro: Primary Key {}",
-            self.get_primary_key()
-        );
-    }
-
-    fn primary_key_field(&self) -> String {
-        "Empty".to_string()
-    }
-
-    fn get_primary_key(&self) -> String {
-        "Empty".to_string()
-    }
+    fn primary_key_field() -> String;
 }

@@ -1,19 +1,22 @@
 pub mod lib_module {
-    include!(concat!(env!("CARGO_MANIFEST_DIR"), "/modules/db/connection.rs"));
+    include!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/modules/db/connection.rs"
+    ));
 }
 
+use dotenvy::dotenv_override;
 use lib_module::Database;
 #[allow(dead_code)]
 use lib_module::DatabaseError;
-use dotenvy::dotenv_override;
 use std::env;
-
 
 #[test]
 fn test_successful_connection() {
-    dotenv_override().ok(); 
+    dotenv_override().ok();
 
-    let _database_url = env::var("DATABASE_URL").expect("DATABASE_URL deve estar definida para este teste");
+    let _database_url =
+        env::var("DATABASE_URL").expect("DATABASE_URL deve estar definida para este teste");
 
     let mut db = Database::new();
     let result = db.connect();
@@ -32,13 +35,17 @@ fn test_successful_connection() {
 fn test_execute_query() {
     let mut db = Database::new();
 
-    let insert_query = "INSERT INTO \"Users\" (name) VALUES ('Alice'), ('Bob'), ('Charlie');"; 
+    let insert_query = "INSERT INTO \"Users\" (name) VALUES ('Alice'), ('Bob'), ('Charlie');";
     let result = db.execute_query(insert_query);
 
     assert!(result.is_ok());
 
     let rows_affected = result.unwrap();
-    assert!(rows_affected > 0, "Esperava-se que mais de 0 linhas fossem afetadas, mas obtivemos: {}", rows_affected);
+    assert!(
+        rows_affected > 0,
+        "Esperava-se que mais de 0 linhas fossem afetadas, mas obtivemos: {}",
+        rows_affected
+    );
 
     let select_query = "SELECT * FROM \"Users\";";
     let result = db.execute_query(select_query);
@@ -46,13 +53,16 @@ fn test_execute_query() {
     assert!(result.is_ok());
 
     let rows_returned = result.unwrap();
-    assert!(rows_returned > 0, "Esperava-se que mais de 0 linhas fossem retornadas, mas obtivemos: {}", rows_returned);
+    assert!(
+        rows_returned > 0,
+        "Esperava-se que mais de 0 linhas fossem retornadas, mas obtivemos: {}",
+        rows_returned
+    );
 }
-
 
 #[test]
 fn test_singleton_connection() {
-    dotenv_override().ok(); 
+    dotenv_override().ok();
 
     let result = lib_module::get_shared_connection();
     assert!(
@@ -64,7 +74,7 @@ fn test_singleton_connection() {
 #[allow(dead_code)]
 #[test]
 fn test_reuse_existing_connection() {
-    dotenv_override().ok(); 
+    dotenv_override().ok();
     let mut db = Database::new();
     let _ = db.connect().expect("Conexão inicial deve ser bem-sucedida");
 
@@ -96,17 +106,19 @@ fn test_invalid_database_url() {
     //INFERNNOOOOOOOOOO DE LINGUAGEM
     if let Some(value) = original_value {
         env::set_var("DATABASE_URL", value);
-   
     } else {
         env::remove_var("DATABASE_URL");
         println!("Removendo DATABASE_URL, pois não estava definida originalmente.");
     }
     let result = db.connect();
     let restored_value = env::var("DATABASE_URL").ok();
-    println!("Valor restaurado de DATABASE_URL: {:?} and result {:?}", restored_value, result);
+    println!(
+        "Valor restaurado de DATABASE_URL: {:?} and result {:?}",
+        restored_value, result
+    );
 }
 
 #[allow(dead_code)]
-fn main(){
+fn main() {
     dotenv_override().ok();
 }
