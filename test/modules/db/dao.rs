@@ -15,14 +15,15 @@ use lib_module::DAO;
 use std::env;
 
 #[derive(Serialize, Deserialize, Default)]
-struct User {
+struct Userios1 {
     active: bool,
     username: String,
     email: String,
     sign_in_count: u64,
+    morte: u64
 }
 
-impl DAO for User {}
+impl DAO for Userios1 {}
 
 fn setup() -> Database {
     dotenv_override().ok();
@@ -39,13 +40,15 @@ fn create_table() {}
 #[test]
 fn insert_table() {
     let mut db = setup();
+    println!("{}", db);
     let _ = db.connect();
 
-    let user1 = User {
+    let user1 = Userios1 {
         active: true,
-        username: String::from("someusername123"),
-        email: String::from("someone@example.com"),
+        username: String::from("someusername12332"),
+        email: String::from("someone@exampl2e.com"),
         sign_in_count: 1,
+        morte:3
     };
     user1.create();
     user1.persist();

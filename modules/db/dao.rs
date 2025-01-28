@@ -1,47 +1,53 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use diesel::prelude::*;
+use diesel::sql_types::{BigInt, Double, Bool};
 
+#[allow(dead_code)]
 pub trait DAO: Serialize + for<'de> Deserialize<'de> + Default {
     fn create(&self) {
         let mut db = SINGLETON_INSTANCE.lock().unwrap();
-        let retorno = db.execute_query(&Self::create_sql_query());
-        println!("{}", retorno);
+        let _ = db.execute_query(&Self::create_sql_query());
+       
     }
 
     fn delete(&self) {
         println!("Deletando registro: Primary Key {}", self.get_primary_key());
     }
 
-    fn persist(&self) {
-        println!(
-            "Persistindo registro: Primary Key {}",
-            self.get_primary_key()
-        );
+    fn persist(&self){
         let json = serde_json::to_value(self).unwrap();
+    
         if let Value::Object(fields) = json {
             let table_name = std::any::type_name::<Self>().rsplit("::").next().unwrap();
-
+    
             let columns: Vec<String> = fields.keys().cloned().collect();
-            let placeholders: Vec<String> = columns.iter().map(|_| "?".to_string()).collect();
-            let _values: Vec<String> = fields
-                .values()
-                .map(|v| match v {
-                    Value::String(s) => s.clone(),
-                    Value::Number(n) => n.to_string(),
-                    Value::Bool(b) => b.to_string(),
-                    _ => "".to_string(),
-                })
+    
+            let placeholders: Vec<String> = (1..=columns.len())
+                .map(|i| format!("${}", i))
                 .collect();
-
-            let _query = format!(
-                "INSERT OR REPLACE INTO {} ({}) VALUES ({});",
+    
+            let query = format!(
+                "INSERT INTO {} ({}) VALUES ({});",
                 table_name,
                 columns.join(", "),
                 placeholders.join(", ")
             );
-
-            let mut _db = SINGLETON_INSTANCE.lock().unwrap();
-            //db.execute_query_with_params(&query, values);
+    
+            let values: Vec<String> = fields
+                .values()
+                .map(|value| match value {
+                    Value::String(s) => s.clone(),
+                    Value::Number(n) => n.to_string(),
+                    Value::Bool(b) => b.to_string(),
+                    _ => String::from("NULL"),
+                })
+                .collect();
+            let mut db = SINGLETON_INSTANCE.lock().unwrap();
+            let _ = db.execute_query_with_params(&query, values);
+     
+        } else {
+            panic!("Erro ao serializar o objeto em JSON.");
         }
     }
 
@@ -76,7 +82,17 @@ pub trait DAO: Serialize + for<'de> Deserialize<'de> + Default {
                 }
             }
             let nome_tabela = std::any::type_name::<Self>().rsplit("::").next().unwrap();
-
+            let nome_tabela = nome_tabela
+            .chars()
+            .enumerate()
+            .map(|(i, c)| {
+                if i == 0 {
+                    c.to_uppercase().collect::<String>() 
+                } else {
+                    c.to_lowercase().collect::<String>()
+                }
+            })
+            .collect::<String>();
             let query = format!(
                 "CREATE TABLE IF NOT EXISTS {} (\n    {}\n);",
                 nome_tabela,
