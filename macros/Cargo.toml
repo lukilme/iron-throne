@@ -1,0 +1,16 @@
+[package]
+name = "macros"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true  # Add this line
+name = "macros"
+
+[dependencies]
+util = { path = "../util" }  
+syn = { version = "2.0", features = ["full"] }
+proc-macro2 = "1.0"
+quote = "1.0"
+Inflector = "0.11.4"  # Versão mais recente no crates.io
+tokio-postgres = { version = "0.7", features = ["with-uuid-1"] }

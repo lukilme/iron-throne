@@ -1,0 +1,17 @@
+[package]
+name = "iron-throne-v2"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "test"
+path = "test/test.rs"
+
+[dependencies]
+macros = { path = "./macros" }
+tokio = { version = "1", features = ["full"] }
+tokio-postgres = { version = "0.7", features = ["with-uuid-1"] }
+syn = { version = "2.0", features = ["full"] }
+quote = "1.0"
+proc-macro2 = "1.0"
+Inflector = "0.11.4"
