@@ -2,8 +2,7 @@ use inflector::Inflector;
 use syn::{parse_macro_input, DeriveInput, Attribute, Meta, Lit, Expr, ExprLit};
 use quote::quote;
 use proc_macro::TokenStream; // Correct proc_macro type
-//use proc_macro2::TokenStream as TokenStream2; 
-
+//use proc_macro2::TokenStream as TokenStream2;
 
 #[proc_macro_derive(ActiveRecord, attributes(table_name, primary_key))]
 pub fn derive_active_record(input: TokenStream) -> TokenStream {
@@ -29,12 +28,14 @@ pub fn derive_active_record(input: TokenStream) -> TokenStream {
                     #columns,
                     #placeholders
                 );
-                
-                iron_throne_v2::database::execute_query(&query)
+                let rt = tokio::runtime::Runtime::new().unwrap();
+                rt.block_on(async {
+                    let mut db = iron_throne_v2::database::SINGLETON_INSTANCE.lock().await;
+                    db.execute_query(query.as_str()).await.map(|_| ())
+                })
             }
         }
     };
-    
     expanded.into()
 }
 
