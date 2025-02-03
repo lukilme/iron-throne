@@ -47,6 +47,7 @@ impl Database {
 
     pub async fn execute_query(&mut self, query: &str) -> Result<u64, DbError> {
         let client = self.get_client().await?;
+        println!("{}",query);
         let rows_affected = client
             .execute(query, &[])
             .await
@@ -108,7 +109,7 @@ pub async fn execute_query(query: &str) -> Result<u64, DbError> {
     let mut db = get_shared_connection().await?;
     db.execute_query(query).await
 }
-
+//inutil
 pub async fn execute_query_with_params(
     query: &str,
     params: &[&(dyn ToSql + Sync)],

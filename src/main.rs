@@ -11,7 +11,13 @@ use iron_throne_v2::prelude::active_record::ActiveRecord;
 #[derive(ActiveRecord)]
 struct Usuario {
     #[primary_key]
-    id: i64,
+    id: u64,
+
+    #[min = 1]
+    #[max = 100]
+    age: u8,
+
+    #[not(null)]
     name: String,
 }
 
@@ -29,6 +35,6 @@ fn main() {
 
     let db = setup();
     println!("{}", db);    
-    let user = Usuario { id: 1, name: "Alice".to_string() };
+    let user = Usuario { id: 1,age:12, name: "Alesdadadasd".to_string() };
     user.save().unwrap();
 }
